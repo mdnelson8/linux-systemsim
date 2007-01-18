@@ -409,6 +409,13 @@ config BLK_DEV_INITRD
 	  "real" root file system, etc. See <file:Documentation/initrd.txt>
 	  for details.
 
+config BLK_DEV_SYSTEMSIM
+	depends on PPC_SYSTEMSIM
+	tristate "IBM Full System Simulator Bogus Disk Support"
+	default y
+	help
+	  Provides quick access to disk images in the simulator without
+	  simulating a full IDE or SCSI device.
 
 config CDROM_PKTCDVD
 	tristate "Packet writing on CD/DVD media"

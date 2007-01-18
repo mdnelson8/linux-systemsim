@@ -1,8 +1,13 @@
 /*
- * hvconsole.h
- * Copyright (C) 2004 Ryan S Arnold, IBM Corporation
+ * hvc_console.h
+ * Copyright (C) 2005 IBM Corporation
  *
- * LPAR console support.
+ * Author(s):
+ * 	Ryan S. Arnold <rsa@us.ibm.com>
+ *
+ * hvc_console header information:
+ *      moved here from include/asm-powerpc/hvconsole.h
+ *      and drivers/char/hvc_console.c
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,32 +24,40 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-#ifndef _PPC64_HVCONSOLE_H
-#define _PPC64_HVCONSOLE_H
-#ifdef __KERNEL__
+#ifndef HVC_CONSOLE_H
+#define HVC_CONSOLE_H
 
 /*
- * PSeries firmware will only send/recv up to 16 bytes of character data per
- * hcall.
+ * This is the max number of console adapters that can/will be found as
+ * console devices on first stage console init.  Any number beyond this range
+ * can't be used as a console device but is still a valid tty device.
  */
-#define MAX_VIO_PUT_CHARS	16
-#define SIZE_VIO_GET_CHARS	16
+#define MAX_NR_HVC_CONSOLES	16
 
 /*
- * Vio firmware always attempts to fetch MAX_VIO_GET_CHARS chars.  The 'count'
- * parm is included to conform to put_chars() function pointer template
+ * The Linux TTY code does not support dynamic addition of tty derived devices
+ * so we need to know how many tty devices we might need when space is allocated
+ * for the tty device.  Since this driver supports hotplug of vty adapters we
+ * need to make sure we have enough allocated.
  */
-extern int hvc_get_chars(uint32_t vtermno, char *buf, int count);
-extern int hvc_put_chars(uint32_t vtermno, const char *buf, int count);
+#define HVC_ALLOC_TTY_ADAPTERS	8
+
+
+/* implemented by a low level driver */
+struct hv_ops {
+	int (*get_chars)(uint32_t vtermno, char *buf, int count);
+	int (*put_chars)(uint32_t vtermno, const char *buf, int count);
+};
 
 struct hvc_struct;
 
 /* Register a vterm and a slot index for use as a console (console_init) */
 extern int hvc_instantiate(uint32_t vtermno, int index, struct hv_ops *ops);
+
 /* register a vterm for hvc tty operation (module_init or hotplug add) */
 extern struct hvc_struct * __devinit hvc_alloc(uint32_t vtermno, int irq,
 						 struct hv_ops *ops);
 /* remove a vterm from hvc tty operation (modele_exit or hotplug remove) */
 extern int __devexit hvc_remove(struct hvc_struct *hp);
-#endif /* __KERNEL__ */
-#endif /* _PPC64_HVCONSOLE_H */
+
+#endif // HVC_CONSOLE_H

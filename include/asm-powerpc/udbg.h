@@ -42,6 +42,7 @@ extern void __init udbg_init_pmac_realmode(void);
 extern void __init udbg_init_maple_realmode(void);
 extern void __init udbg_init_iseries(void);
 extern void __init udbg_init_rtas(void);
+extern void __init udbg_init_fss(void);
 
 #endif /* __KERNEL__ */
 #endif /* _ASM_POWERPC_UDBG_H */

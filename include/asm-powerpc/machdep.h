@@ -244,6 +244,7 @@ struct machdep_calls {
 
 extern void default_idle(void);
 extern void native_idle(void);
+extern void systemsim_idle(void);
 
 extern struct machdep_calls ppc_md;
 extern char cmd_line[COMMAND_LINE_SIZE];
