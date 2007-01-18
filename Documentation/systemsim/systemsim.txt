@@ -1,0 +1,92 @@
+                SystemSim: PowerPC Full-System Simulator
+
+Introduction
+============
+
+What is the IBM Full-System Simulator for IBM PowerPC 970?
+----------------------------------------------------------
+
+The IBM Full-System Simulator has been developed and refined in conjunction
+with several large-system design projects built upon the IBM Power Architecture.
+As an execution-driven, full-system simulator, the IBM Full-System Simulator has
+facilitated the experimentation and evaluation of a wide variety of system
+components for core IBM initiatives, such as the STI Cell and the IBM PERCS
+projects. The IBM Full-System Simulator for PowerPC 970 enables development
+teams both within and outside IBM to simulate a PowerPC 970 system in order to
+develop and enhance application support for this platform.
+
+This technology runs on AIX®, Linux®, and Mac OS X (see the requirements
+section on the website for details).
+
+How does it work?
+-----------------
+
+Written in C, a significant part of the Full-System Simulator's simulation
+capability is directly attributed to its TSIM component. Developed as a
+robust, high-performance alternative to conventional process and thread
+programming, TSIM is a light-weight, multi-tasking scheduling framework that
+provides a complete set of facilities for creating and scheduling threads,
+manipulating time delays, and applying a variety of inter-thread communication
+policies and mechanisms to simulation events.
+
+In TSIM's multi-threaded approach, individually-schedulable threads are created
+to simulate a component or collection of components. If a thread must defer
+processing, it requests to be blocked and continues execution when awakened. Any
+local (stack) state is preserved in order to mitigate the necessity for
+allocating areas for saving and restoring this state. TSIM threads are
+non-preemptive; they block only on well-defined events. TSIM simplifies access
+to shared data that must otherwise be serialized in order to guarantee correct
+behavior. Each thread has an associated priority. Scheduling and resource
+allocations are all "first-come, first-served" (FCFS) within priority. TSIM also
+includes software components useful for modeling common hardware components
+such as gates, latches, and ports.
+
+This low-level simulation infrastructure is complemented with a host of
+additional features, such as integrated development and debugging tools,
+support for stand-alone and operating system boot, data collection and
+analysis frameworks, performance visualization, and tracing and logging
+capabilities that enable developers to realistically represent an entire
+system of equipment, devices, or subsystems and simulate not only the
+instructions executed by the processor core, but also its interactions with
+its surrounding system components. Additionally, the Full-System Simulator is
+capable of booting K42, IBM's research operating system, and rHype, the
+research hypervisor.
+
+About the technology author(s):
+-------------------------------
+
+The IBM Full-System Simulator has been developed by the Future Systems group at
+the IBM Austin Research Lab (ARL). Consisting of the Performance and Tools team,
+Novel Systems Architecture team, and Power-Aware Systems team, Future Systems
+focuses on software system issues, including system-level power analysis, system
+performance, and low-level system software issues. The researchers bring a wide
+variety of expertise and extensive experience in numerous software and hardware
+technologies to the team, including computer architecture, performance analysis,
+operating systems, power management, and algorithms.
+
+Where can I get it?
+-------------------
+
+The IBM PowerPC Full-System Simulator is available from the IBM Alphaworks
+website: http://www.alphaworks.ibm.com/tech/systemsim970
+
+Compiling & Booting Linux for SystemSim
+=======================================
+
+When compiling Linux to run on SystemSim you should use the configuration
+file in arch/ppc64/configs/systemsim_defconfig as a base.
+
+When booting the resulting image in SystemSim use the maple.tcl file in
+this directory (Documentation/systemsim/maple.tcl) as a base.  You will
+likely need to change the name of the root disk image and perhaps the path
+to the vmlinux file.  This standard profile will be included with the
+SystemSim tool in the near future (at which point we will hopefully update
+this document.
+
+For further information on using Linux with SystemSim, please reference the
+SystemSim documentation, and the FAQ and/or Forums on the Alphaworks site.
+
+
+
+
+

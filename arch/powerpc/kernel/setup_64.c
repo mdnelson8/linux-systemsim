@@ -488,6 +488,24 @@ static void __init emergency_stack_init(void)
 }
 
 /*
+ * Detect if we are running on top of the IBM Full System Simulator.
+ * If we are, use the optimized idle loop for that case.
+ */
+static void __init setup_systemsim_idle(void)
+{
+#ifdef CONFIG_SYSTEMSIM_IDLE
+	struct device_node *mambo_node;
+
+	mambo_node = of_find_node_by_path("/mambo");
+	if (mambo_node) {
+		printk(KERN_INFO "Systemsim detected: Using optomized idle loop\n");
+		ppc_md.idle_loop = systemsim_idle;
+		of_node_put(mambo_node);
+	}
+#endif
+}
+
+/*
  * Called into from start_kernel, after lock_kernel has been called.
  * Initializes bootmem, which is unsed to manage page allocation until
  * mem_init is called.
@@ -531,6 +549,8 @@ void __init setup_arch(char **cmdline_p)
 #endif
 
 	ppc_md.setup_arch();
+
+	setup_systemsim_idle();
 
 	paging_init();
 	ppc64_boot_msg(0x15, "Setup Done");
