@@ -168,14 +168,22 @@ static void __init pSeries_setup_mpic(void)
 
 	/* Get the sense values from OF */
 	prom_get_irq_senses(senses, NUM_ISA_INTERRUPTS, NR_IRQS);
-	
+
 	/* Setup the openpic driver */
 	irq_count = NR_IRQS - NUM_ISA_INTERRUPTS - 4; /* leave room for IPIs */
+#ifndef CONFIG_SYSTEMSIM_BOOT
 	pSeries_mpic = mpic_alloc(openpic_addr, MPIC_PRIMARY,
-				  16, 16, irq_count, /* isu size, irq offset, irq count */ 
+				  16, 16, irq_count, /* isu size, irq offset, irq count */
 				  NR_IRQS - 4, /* ipi offset */
 				  senses, irq_count, /* sense & sense size */
 				  " MPIC     ");
+#else /* CONFIG_SYSTEMSIM_BOOT */
+	pSeries_mpic = mpic_alloc(openpic_addr, MPIC_PRIMARY,
+				  0, 0, irq_count, /* isu size, irq offset, irq count */
+				  NR_IRQS - 4, /* ipi offset */
+				  senses, irq_count, /* sense & sense size */
+				  " MPIC     ");
+#endif /* CONFIG_SYSTEMSIM_BOOT */
 }
 
 static void pseries_lpar_enable_pmcs(void)
