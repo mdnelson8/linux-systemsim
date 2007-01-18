@@ -152,10 +152,17 @@ static void __init pseries_mpic_init_IRQ(void)
 	BUG_ON(openpic_addr == 0);
 
 	/* Setup the openpic driver */
+#ifndef CONFIG_SYSTEMSIM_BOOT
 	mpic = mpic_alloc(pSeries_mpic_node, openpic_addr,
 			  MPIC_PRIMARY,
 			  16, 250, /* isu size, irq count */
 			  " MPIC     ");
+#else
+	mpic = mpic_alloc(pSeries_mpic_node, openpic_addr,
+			  MPIC_PRIMARY,
+			  0, 250, /* isu size, irq count */
+			  " MPIC     ");
+#endif /* CONFIG_SYSTEMSIM_BOOT */
 	BUG_ON(mpic == NULL);
 
 	/* Add ISUs */
@@ -446,6 +453,7 @@ static int __init pSeries_probe(void)
 	unsigned long root = of_get_flat_dt_root();
  	char *dtype = of_get_flat_dt_prop(of_get_flat_dt_root(),
  					  "device_type", NULL);
+#ifndef CONFIG_SYSTEMSIM_BOOT
  	if (dtype == NULL)
  		return 0;
  	if (strcmp(dtype, "chrp"))
@@ -457,7 +465,7 @@ static int __init pSeries_probe(void)
 	if (of_flat_dt_is_compatible(root, "IBM,CPBW-1.0") ||
 	    of_flat_dt_is_compatible(root, "IBM,CBEA"))
 		return 0;
-
+#endif
 	DBG("pSeries detected, looking for LPAR capability...\n");
 
 	/* Now try to figure out if we are running on LPAR */

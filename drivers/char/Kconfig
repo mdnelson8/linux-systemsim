@@ -588,29 +588,27 @@ config HVC_ISERIES
 	help
 	  iSeries machines support a hypervisor virtual console.
 
+config HVC_FSS
+        bool "IBM Full System Simulator Console support"
+        depends on PPC_SYSTEMSIM
+        select HVC_DRIVER
+        help
+          IBM Full System Simulator Console device driver which makes use of
+          the HVC_DRIVER front end.
+
+config PPC_EARLY_DEBUG_FSS
+        bool "IBM Full System Simulator Console early debug support"
+        depends on PPC_SYSTEMSIM
+        select HVC_FSS
+        help
+          Display early debug info over the Full System simulator console
+
 config HVC_RTAS
 	bool "IBM RTAS Console support"
 	depends on PPC_RTAS
 	select HVC_DRIVER
 	help
 	  IBM Console device driver which makes use of RTAS
-
-config HVCS
-	tristate "IBM Hypervisor Virtual Console Server support"
-	depends on PPC_PSERIES
-	help
-	  Partitionable IBM Power5 ppc64 machines allow hosting of
-	  firmware virtual consoles from one Linux partition by
-	  another Linux partition.  This driver allows console data
-	  from Linux partitions to be accessed through TTY device
-	  interfaces in the device tree of a Linux partition running
-	  this driver.
-
-	  To compile this driver as a module, choose M here: the
-	  module will be called hvcs.ko.  Additionally, this module
-	  will depend on arch specific APIs exported from hvcserver.ko
-	  which will also be compiled when this driver is built as a
-	  module.
 
 source "drivers/char/ipmi/Kconfig"
 
