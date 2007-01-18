@@ -182,7 +182,8 @@ static int __init cell_probe(void)
 	unsigned long root = of_get_flat_dt_root();
 
 	if (!of_flat_dt_is_compatible(root, "IBM,CBEA") &&
-	    !of_flat_dt_is_compatible(root, "IBM,CPBW-1.0"))
+	    !of_flat_dt_is_compatible(root, "IBM,CPBW-1.0") &&
+	    !of_flat_dt_is_compatible(root, "IBM,CPBW-SystemSim"))
 		return 0;
 
 	hpte_init_native();
