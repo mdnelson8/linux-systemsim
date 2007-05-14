@@ -52,6 +52,7 @@
 
 #define MAJOR_NR 42
 #define MAX_SYSTEMSIM_BD 128
+#define BD_SECT_SZ 512
 
 #define SYSTEMSIM_BD_SET_BLKSIZE _IO( 0xab, 1 )
 #define SYSTEMSIM_BD_SET_SIZE    _IO( 0xab, 2 )
@@ -80,6 +81,7 @@ static struct systemsim_bd_device systemsim_bd_dev[MAX_SYSTEMSIM_BD];
 static inline int
 systemsim_disk_read(int devno, void *buf, ulong sect, ulong nrsect)
 {
+	memset(buf, 0, nrsect*BD_SECT_SZ);
 	return callthru3(BOGUS_DISK_READ, (unsigned long)buf,
 			 (unsigned long)sect,
 			 (unsigned long)((nrsect << 16) | devno));
