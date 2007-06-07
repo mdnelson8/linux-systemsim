@@ -103,12 +103,12 @@ static int systemsim_net_probedev(int devno, void *buf)
 	struct device_node *net;
 	unsigned int *reg;
 
-	systemsim = find_path_device("/systemsim");
+	systemsim = of_find_node_by_path("/systemsim");
 
 	if (systemsim == NULL) {
 		return -1;
 	}
-	net = find_path_device("/systemsim/bogus-net@0");
+	net = of_find_node_by_path("/systemsim/bogus-net@0");
 	if (net == NULL) {
 		return -1;
 	}

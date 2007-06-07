@@ -229,7 +229,7 @@ static int __init systemsim_bd_init(void)
 	int err = -ENOMEM;
 	int i;
 
-	systemsim = find_path_device("/systemsim");
+	systemsim = of_find_node_by_path("/systemsim");
 
 	if (systemsim == NULL) {
 		printk("NO SYSTEMSIM BOGUS DISK DETECTED\n");
