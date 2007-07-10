@@ -87,7 +87,7 @@ static inline int systemsim_bogusnet_recv(int devno, void *buf, ulong size)
 static irqreturn_t
 systemsim_net_intr(int irq, void *dev_instance);
 
-#define MAMBO_MTU 1500
+#define SYSTEMSIM_MTU 1500
 
 struct netdev_private {
 	struct delayed_work poll_task;
@@ -327,7 +327,7 @@ int __init do_systemsim_net_probe(struct net_device *dev)
 	SET_MODULE_OWNER(dev);
 
 	dev->irq = irq;
-	dev->mtu = MAMBO_MTU;
+	dev->mtu = SYSTEMSIM_MTU;
 	dev->open = systemsim_net_open;
 	dev->poll = systemsim_net_poll;
 	dev->weight = 16;

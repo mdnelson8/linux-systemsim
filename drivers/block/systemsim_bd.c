@@ -211,11 +211,11 @@ static struct block_device_operations systemsim_bd_fops = {
 
 static spinlock_t systemsim_bd_lock = SPIN_LOCK_UNLOCKED;
 
-static int mambo_detect(void)
+static int systemsim_detect(void)
 {
 	struct device_node *n;
 
-	n = of_find_node_by_path("/mambo");
+	n = of_find_node_by_path("/systemsim");
 	if (n) {
 		of_node_put(n);
 		return 1;
@@ -233,11 +233,8 @@ static int __init systemsim_bd_init(void)
 
 	if (systemsim == NULL) {
 		printk("NO SYSTEMSIM BOGUS DISK DETECTED\n");
-		return -1;
-	}
-
-	if (!mambo_detect())
 		return -ENODEV;
+	}
 
 	/*
 	 * We could detect which disks are configured in openfirmware

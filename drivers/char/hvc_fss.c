@@ -113,7 +113,7 @@ module_init(hvc_fss_init);
 static int __init hvc_fss_console_init(void)
 {
 	/* Don't register if we aren't running on the simulator */
-	if (!of_find_node_by_path("/mambo"))
+	if (!of_find_node_by_path("/systemsim"))
 		return -ENODEV;
 
 #ifdef CONFIG_HVC_RTAS

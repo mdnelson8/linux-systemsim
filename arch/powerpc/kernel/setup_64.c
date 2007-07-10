@@ -494,13 +494,13 @@ static void __init emergency_stack_init(void)
 static void __init setup_systemsim_idle(void)
 {
 #ifdef CONFIG_SYSTEMSIM_IDLE
-	struct device_node *mambo_node;
+	struct device_node *systemsim_node;
 
-	mambo_node = of_find_node_by_path("/mambo");
-	if (mambo_node) {
+	systemsim_node = of_find_node_by_path("/systemsim");
+	if (systemsim_node) {
 		printk(KERN_INFO "Systemsim detected: Using optomized idle loop\n");
 		ppc_md.idle_loop = systemsim_idle;
-		of_node_put(mambo_node);
+		of_node_put(systemsim_node);
 	}
 #endif
 }
