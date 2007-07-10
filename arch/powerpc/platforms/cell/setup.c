@@ -188,7 +188,8 @@ static int __init cell_probe(void)
 
 	/* deprecated use of device tree */
 	if (of_flat_dt_is_compatible(root, "IBM,CPBW-SystemSim"))
-		printk("FIXME: DEPRECATED /compatible PROPERTY IN SYSTEMSYM DEVICE TREE\n");
+		printk(KERN_WARNING
+		 "FIXME: DEPRECATED /compatible PROPERTY IN DEVTREE\n");
 
 	hpte_init_native();
 

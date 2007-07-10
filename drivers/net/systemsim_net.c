@@ -45,8 +45,8 @@
 #include <linux/init.h>
 
 #include <asm/system.h>
-#include <asm/uaccess.h>
-#include <asm/io.h>
+#include <linux/uaccess.h>
+#include <linux/io.h>
 
 #include <linux/inet.h>
 #include <linux/netdevice.h>
@@ -63,6 +63,8 @@
 #define SYSTEMSIM_NET_PROBE   119
 #define SYSTEMSIM_NET_SEND    120
 #define SYSTEMSIM_NET_RECV    121
+
+static int nextdevno;	/* running count of device numbers */
 
 static inline int systemsim_bogusnet_probe(int devno, void *buf)
 {
@@ -164,7 +166,8 @@ static int systemsim_net_poll(struct net_device *dev, int *budget)
 	int ret = 0;
 
 	while ((ns = systemsim_net_recv(devno, buffer, 1600)) > 0) {
-		if ((skb = dev_alloc_skb(ns + 2)) != NULL) {
+		skb = dev_alloc_skb(ns + 2);
+		if (skb != NULL) {
 			skb->dev = dev;
 			skb_reserve(skb, 2);	/* 16 byte align the IP
 						 * header */
@@ -185,7 +188,7 @@ static int systemsim_net_poll(struct net_device *dev, int *budget)
 			np->stats.rx_packets++;
 			np->stats.rx_bytes += ns;
 		} else {
-			printk("Failed to allocated skbuff, "
+			printk(KERN_WARNING "Failed to allocated skbuff, "
 			       "dropping packet\n");
 			np->stats.rx_dropped++;
 			/* wait for another cycle */
@@ -210,7 +213,8 @@ static void systemsim_net_timer(struct work_struct *ptp)
 {
 	int budget = 16;
 	struct delayed_work *rptp = (struct delayed_work *)ptp;
-	struct netdev_private *priv = (struct netdev_private *) container_of(rptp, struct netdev_private, poll_task);
+	struct netdev_private *priv = (struct netdev_private *)
+	   container_of(rptp, struct netdev_private, poll_task);
 	struct net_device *dev = (struct net_device *) priv->data;
 
 	systemsim_net_poll(dev, &budget);
@@ -302,7 +306,6 @@ static int systemsim_net_ioctl(struct net_device *dev, struct ifreq *ifr,
 {
 	return -EOPNOTSUPP;
 }
-static int nextdevno = 0;	/* running count of device numbers */
 
 /* Initialize the rest of the device. */
 int __init do_systemsim_net_probe(struct net_device *dev)
@@ -311,16 +314,16 @@ int __init do_systemsim_net_probe(struct net_device *dev)
 	int devno = nextdevno++;
 	int irq;
 
-	printk("eth%d: bogus network driver initialization\n", devno);
+	printk(KERN_INFO "eth%d: bogus network driver initialization\n", devno);
 
 	irq = systemsim_net_probedev(devno, dev->dev_addr);
 
 	if (irq < 0) {
-		printk("No IRQ retreived\n");
+		printk(KERN_ERR "No IRQ retreived\n");
 		return (-ENODEV);
 	}
 
-	printk("%s: %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n", dev->name,
+	printk(KERN_INFO "%s: %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n", dev->name,
 	       dev->dev_addr[0], dev->dev_addr[1], dev->dev_addr[2],
 	       dev->dev_addr[3], dev->dev_addr[4], dev->dev_addr[5]);
 
@@ -377,7 +380,7 @@ struct net_device *__init systemsim_net_probe(int unit)
 
 	return dev;
 
-      out:
+out:
 	free_netdev(dev);
 	return ERR_PTR(err);
 }

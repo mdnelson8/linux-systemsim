@@ -47,8 +47,8 @@
 #include <asm/systemsim.h>
 #include <asm/prom.h>
 
-#include <asm/uaccess.h>
-#include <asm/types.h>
+#include <linux/uaccess.h>
+#include <linux/types.h>
 
 #define MAJOR_NR 42
 #define MAX_SYSTEMSIM_BD 128
@@ -124,7 +124,7 @@ static int systemsim_bd_init_disk(int devno)
 	return 1;
 }
 
-static void do_systemsim_bd_request(request_queue_t * q)
+static void do_systemsim_bd_request(request_queue_t *q)
 {
 	int result = 0;
 	struct request *req;
@@ -202,26 +202,13 @@ static int systemsim_bd_open(struct inode *inode, struct file *file)
 }
 
 static struct block_device_operations systemsim_bd_fops = {
-      owner:THIS_MODULE,
-      open:systemsim_bd_open,
-      release:systemsim_bd_release,
-	/* media_changed:      systemsim_bd_check_change, */
-      revalidate_disk:systemsim_bd_revalidate,
+	.owner =		THIS_MODULE,
+	.open =			systemsim_bd_open,
+	.release =		systemsim_bd_release,
+	.revalidate_disk =	systemsim_bd_revalidate,
 };
 
 static spinlock_t systemsim_bd_lock = SPIN_LOCK_UNLOCKED;
-
-static int systemsim_detect(void)
-{
-	struct device_node *n;
-
-	n = of_find_node_by_path("/systemsim");
-	if (n) {
-		of_node_put(n);
-		return 1;
-	}
-	return 0;
-}
 
 static int __init systemsim_bd_init(void)
 {
@@ -232,7 +219,7 @@ static int __init systemsim_bd_init(void)
 	systemsim = of_find_node_by_path("/systemsim");
 
 	if (systemsim == NULL) {
-		printk("NO SYSTEMSIM BOGUS DISK DETECTED\n");
+		printk(KERN_ERR "NO SYSTEMSIM BOGUS DISK DETECTED\n");
 		return -ENODEV;
 	}
 
@@ -266,10 +253,10 @@ static int __init systemsim_bd_init(void)
 		goto out;
 	}
 #ifdef MODULE
-	printk("systemsim bogus disk: registered device at major %d\n",
+	printk(KERN_INFO "systemsim bogus disk: device at major %d\n",
 	       MAJOR_NR);
 #else
-	printk("systemsim bogus disk: compiled in with kernel\n");
+	printk(KERN_INFO "systemsim bogus disk: compiled in with kernel\n");
 #endif
 
 	/*
@@ -293,7 +280,7 @@ static int __init systemsim_bd_init(void)
 	}
 
 	return 0;
-      out:
+out:
 	while (i--) {
 		if (systemsim_bd_dev[i].disk->queue)
 			blk_cleanup_queue(systemsim_bd_dev[i].disk->queue);
@@ -306,9 +293,9 @@ static void __exit systemsim_bd_cleanup(void)
 {
 
 	if (unregister_blkdev(MAJOR_NR, "systemsim_bd") != 0)
-		printk("systemsim_bd: cleanup_module failed\n");
+		printk(KERN_ERR "systemsim_bd: cleanup_module failed\n");
 	else
-		printk("systemsim_bd: module cleaned up.\n");
+		printk(KERN_INFO "systemsim_bd: module cleaned up.\n");
 }
 
 module_init(systemsim_bd_init);

@@ -36,7 +36,7 @@
 #include <linux/console.h>
 
 #include <asm/prom.h>
-#include <asm/irq.h>
+#include <linux/irq.h>
 #include <asm/rtas.h>
 #include <asm/systemsim.h>
 #include <asm/udbg.h>
@@ -66,11 +66,11 @@ static int hvc_fss_read_console(uint32_t vtermno, char *buf, int count)
 
 	got = 0;
 	for (i = 0; i < count; i++) {
-		if ((c = callthru0(SIM_READ_CONSOLE_CODE)) != -1) {
+		c = callthru0(SIM_READ_CONSOLE_CODE);
+		if (c != -1) {
 			buf[i] = c;
 			++got;
-		}
-		else
+		} else
 			break;
 	}
 	return got;

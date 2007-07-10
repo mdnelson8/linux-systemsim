@@ -498,7 +498,8 @@ static void __init setup_systemsim_idle(void)
 
 	systemsim_node = of_find_node_by_path("/systemsim");
 	if (systemsim_node) {
-		printk(KERN_INFO "Systemsim detected: Using optomized idle loop\n");
+		printk(KERN_INFO
+		 "Systemsim detected: Using optomized idle loop\n");
 		ppc_md.idle_loop = systemsim_idle;
 		of_node_put(systemsim_node);
 	}
