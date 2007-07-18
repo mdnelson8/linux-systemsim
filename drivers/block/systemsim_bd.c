@@ -5,7 +5,13 @@
  *
  *  Bogus Disk Driver
  *
- *  Author: Eric Van Hensbegren <ericvh@gmail.com>
+ *  DISCLAIMER: THIS CODE IS A HACK.  It was done quickly to serve
+ *  a particular purpose and has now been repurposed several times.
+ *  It is ugly and wrong on several levels, but it works for most
+ *  folks.  I will happily integrate any fixups or cleanups that are 
+ *  submitted, otherwise stop whinning - its called bogus for a reason.
+ *  
+ *  Author: Eric Van Hensbegren <bergevan@us.ibm.com>
  *
  *    inspired by drivers/block/nbd.c
  *    written by Pavel Machek and Steven Whitehouse

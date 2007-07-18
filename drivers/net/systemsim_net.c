@@ -1,12 +1,19 @@
 /*
  *  Bogus Network Driver for PowerPC Full System Simulator
  *
- *  (C) Copyright IBM Corporation 2003-2005
+ *  (C) Copyright IBM Corporation 2003-2007
  *
  *  Bogus Network Driver
  *
- *  Author: JimiX <jimix@watson.ibm.com>
- *  Maintained By: Eric Van Hensbergen <ericvh@gmail.com>
+ *  DISCLAIMER: THIS CODE IS A HACK.  It was done quickly to serve
+ *  a particular purpose and has now been repurposed several times.
+ *  It is ugly and wrong on several levels, but it works for most
+ *  folks.  I will happily integrate any fixups or cleanups that are 
+ *  submitted, otherwise stop whinning - its called bogus for a reason.
+ *
+ *  Original Hack By: Eric Van Hensbergen <bergevan@us.ibm.com>
+ *  Fixes By: JimiX <jimix@watson.ibm.com>
+ *  Maintained By: Eric Van Hensbergen <bergevan@us.ibm.com>
  *
  * 	inspired by drivers/net/ibmveth.c
  *	written by Dave Larson
