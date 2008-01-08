@@ -1250,6 +1250,14 @@ config IBMVETH
 
 source "drivers/net/ibm_newemac/Kconfig"
 
+config SYSTEMSIM_NET
+	depends on PPC_SYSTEMSIM
+	tristate "IBM Full System Simulator Bogus Network Support"
+	default y
+	help
+	  Provides quick access to a raw ethernet device in the simulator
+	  without simulating any specific network device hardware.
+
 config NET_PCI
 	bool "EISA, VLB, PCI and on board controllers"
 	depends on ISA || EISA || PCI

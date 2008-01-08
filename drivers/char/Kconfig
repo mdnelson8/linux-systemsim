@@ -608,6 +608,21 @@ config HVC_ISERIES
 	help
 	  iSeries machines support a hypervisor virtual console.
 
+config HVC_FSS
+        bool "IBM Full System Simulator Console support"
+        depends on PPC_SYSTEMSIM
+        select HVC_DRIVER
+        help
+          IBM Full System Simulator Console device driver which makes use of
+          the HVC_DRIVER front end.
+
+config PPC_EARLY_DEBUG_FSS
+        bool "IBM Full System Simulator Console early debug support"
+        depends on PPC_SYSTEMSIM
+        select HVC_FSS
+        help
+          Display early debug info over the Full System simulator console
+
 config HVC_RTAS
 	bool "IBM RTAS Console support"
 	depends on PPC_RTAS

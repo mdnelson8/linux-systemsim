@@ -27,8 +27,10 @@ obj-$(CONFIG_BLK_DEV_CRYPTOLOOP) += cryptoloop.o
 obj-$(CONFIG_VIRTIO_BLK)	+= virtio_blk.o
 
 obj-$(CONFIG_VIODASD)		+= viodasd.o
+obj-$(CONFIG_BLK_DEV_SYSTEMSIM)	+= systemsim_bd.o
 obj-$(CONFIG_BLK_DEV_SX8)	+= sx8.o
 obj-$(CONFIG_BLK_DEV_UB)	+= ub.o
 obj-$(CONFIG_BLK_DEV_HD)	+= hd.o
 
-obj-$(CONFIG_XEN_BLKDEV_FRONTEND)	+= xen-blkfront.o
+obj-$(CONFIG_XEN_BLKDEV_FRONTEND) += xen-blkfront.o
+obj-$(CONFIG_LGUEST_BLOCK)	  += lguest_blk.o
