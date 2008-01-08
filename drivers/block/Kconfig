@@ -357,6 +357,30 @@ config BLK_DEV_XIP
 	  will prevent RAM block device backing store memory from being
 	  allocated from highmem (only a problem for highmem systems).
 
+config BLK_DEV_INITRD
+	bool "Initial RAM filesystem and RAM disk (initramfs/initrd) support"
+	depends on BROKEN || !FRV
+	help
+	  The initial RAM filesystem is a ramfs which is loaded by the
+	  boot loader (loadlin or lilo) and that is mounted as root
+	  before the normal boot procedure. It is typically used to
+	  load modules needed to mount the "real" root file system,
+	  etc. See <file:Documentation/initrd.txt> for details.
+
+	  If RAM disk support (BLK_DEV_RAM) is also included, this
+	  also enables initial RAM disk (initrd) support and adds
+	  15 Kbytes (more on some other architectures) to the kernel size.
+
+	  If unsure say Y.
+
+config BLK_DEV_SYSTEMSIM
+	depends on PPC_SYSTEMSIM
+	tristate "IBM Full System Simulator Bogus Disk Support"
+	default y
+	help
+	  Provides quick access to disk images in the simulator without
+	  simulating a full IDE or SCSI device.
+
 config CDROM_PKTCDVD
 	tristate "Packet writing on CD/DVD media"
 	depends on !UML
