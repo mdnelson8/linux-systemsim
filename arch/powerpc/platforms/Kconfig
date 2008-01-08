@@ -47,6 +47,34 @@ config PPC_UDBG_BEAT
 	depends on PPC_CELLEB
 	default n
 
+config PPC_SYSTEMSIM
+	bool "IBM Full System Simulator (systemsim) support"
+	depends on PPC_CELL || PPC_PSERIES || PPC_MAPLE
+	help
+          Support booting resulting image under IBMs Full System Simulator.
+          If you enable this option, you are able to select device
+          drivers (e.g. network and disk) for purely simulated devices
+          that are provided by systemsim.
+          The Full system simulator is available for download from
+          http://www.alphaworks.ibm.com/tech/.
+
+config SYSTEMSIM_IDLE
+	bool "Optimized idle loop for systemsim"
+	depends on PPC_SYSTEMSIM
+	help
+          Selecting this option will enable an more optimized idle loop
+          for running on the IBM Full System Simulator that
+          significantly reduces the load on the host system when
+          simulating an idle system.
+
+config SYSTEMSIM_BOOT
+	bool "Boot hacks for non-standard hardware under systemsim"
+	depends on PPC_SYSTEMSIM
+	help
+          Selecting this option will enable boot hacks during setup
+          to facilitate Linux boots on non-standard hardware under the
+          IBM Full System Simulator.
+
 config XICS
 	depends on PPC_PSERIES
 	bool
