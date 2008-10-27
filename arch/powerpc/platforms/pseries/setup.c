@@ -460,6 +460,7 @@ static int __init pSeries_probe(void)
  		return 0;
  	if (strcmp(dtype, "chrp"))
 		return 0;
+#endif
 
 	/* Cell blades firmware claims to be chrp while it's not. Until this
 	 * is fixed, we need to avoid those here.
