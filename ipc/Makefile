@@ -9,3 +9,6 @@ obj_mq-$(CONFIG_COMPAT) += compat_mq.o
 obj-$(CONFIG_POSIX_MQUEUE) += mqueue.o msgutil.o $(obj_mq-y)
 obj-$(CONFIG_IPC_NS) += namespace.o
 
+# build with -O0 to work around ppu-gcc bug
+ipc/compat.o: KBUILD_CFLAGS += -O0
+ipc/msg.o: KBUILD_CFLAGS += -O0
