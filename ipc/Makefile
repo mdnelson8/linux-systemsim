@@ -10,3 +10,6 @@ obj-$(CONFIG_POSIX_MQUEUE) += mqueue.o msgutil.o $(obj_mq-y)
 obj-$(CONFIG_IPC_NS) += namespace.o
 obj-$(CONFIG_POSIX_MQUEUE_SYSCTL) += mq_sysctl.o
 
+# build with -O0 to work around ppu-gcc bug
+ipc/compat.o: KBUILD_CFLAGS += -O0
+ipc/msg.o: KBUILD_CFLAGS += -O0
