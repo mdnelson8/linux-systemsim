@@ -130,7 +130,7 @@ static int systemsim_bd_init_disk(int devno)
 	return 1;
 }
 
-static void do_systemsim_bd_request(request_queue_t *q)
+static void do_systemsim_bd_request(struct request_queue *q)
 {
 	int result = 0;
 	struct request *req;
