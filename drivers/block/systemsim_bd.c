@@ -57,7 +57,7 @@
 #include <linux/types.h>
 
 #define MAJOR_NR 42
-#define MAX_SYSTEMSIM_BD 128
+#define MAX_SYSTEMSIM_BD 16
 #define BD_SECT_SZ 512
 
 #define SYSTEMSIM_BD_SET_BLKSIZE _IO( 0xab, 1 )
@@ -157,27 +157,6 @@ static void do_systemsim_bd_request(struct request_queue *q)
 	}
 }
 
-static int systemsim_bd_release(struct inode *inode, struct file *file)
-{
-	struct systemsim_bd_device *lo;
-	int dev;
-
-	if (!inode)
-		return -ENODEV;
-	dev = inode->i_bdev->bd_disk->first_minor;
-	if (dev >= MAX_SYSTEMSIM_BD)
-		return -ENODEV;
-	if (systemsim_disk_info(BD_INFO_SYNC, dev) < 0) {
-		printk(KERN_ALERT "systemsim_bd_release: unable to sync\n");
-	}
-	lo = &systemsim_bd_dev[dev];
-	if (lo->refcnt <= 0)
-		printk(KERN_ALERT "systemsim_bd_release: refcount(%d) <= 0\n",
-		       lo->refcnt);
-	lo->refcnt--;
-	return 0;
-}
-
 static int systemsim_bd_revalidate(struct gendisk *disk)
 {
 	int devno = disk->first_minor;
@@ -187,30 +166,8 @@ static int systemsim_bd_revalidate(struct gendisk *disk)
 	return 0;
 }
 
-static int systemsim_bd_open(struct inode *inode, struct file *file)
-{
-	int dev;
-
-	if (!inode)
-		return -EINVAL;
-	dev = inode->i_bdev->bd_disk->first_minor;
-	if (dev >= MAX_SYSTEMSIM_BD)
-		return -ENODEV;
-
-	check_disk_change(inode->i_bdev);
-
-	if (!systemsim_bd_dev[dev].initialized)
-		if (!systemsim_bd_init_disk(dev))
-			return -ENODEV;
-
-	systemsim_bd_dev[dev].refcnt++;
-	return 0;
-}
-
 static struct block_device_operations systemsim_bd_fops = {
 	.owner =		THIS_MODULE,
-	.open =			systemsim_bd_open,
-	.release =		systemsim_bd_release,
 	.revalidate_disk =	systemsim_bd_revalidate,
 };
 
@@ -253,16 +210,20 @@ static int __init systemsim_bd_init(void)
 			goto out;
 		}
 	}
-
-	if (register_blkdev(MAJOR_NR, "systemsim_bd")) {
-		err = -EIO;
+	
+	
+	err = register_blkdev(MAJOR_NR, "systemsim_bd");
+	if(err < 0) {
+		printk(KERN_INFO 
+			"systemsim bogus disk: failed to reg %d\n",err);
 		goto out;
 	}
 #ifdef MODULE
 	printk(KERN_INFO "systemsim bogus disk: device at major %d\n",
 	       MAJOR_NR);
 #else
-	printk(KERN_INFO "systemsim bogus disk: compiled in with kernel\n");
+	printk(KERN_INFO "systemsim bogus disk: registered at major %d(%d)\n",
+			err, MAJOR_NR);
 #endif
 
 	/*
@@ -277,6 +238,7 @@ static int __init systemsim_bd_init(void)
 		systemsim_bd_dev[i].refcnt = 0;
 		systemsim_bd_dev[i].flags = 0;
 		disk->major = MAJOR_NR;
+		disk->minors = 1;
 		disk->first_minor = i;
 		disk->fops = &systemsim_bd_fops;
 		disk->private_data = &systemsim_bd_dev[i];
