@@ -213,7 +213,7 @@ static int systemsim_net_poll(struct napi_struct *napi, int budget)
 	budget -= frames;
 
 	if ((!ret) && (dev->irq))
-		netif_rx_complete(napi);
+		napi_complete(napi);
 
 	return ret;
 }
@@ -245,8 +245,8 @@ systemsim_net_intr(int irq, void *dev_instance)
 	struct netdev_private *priv = netdev_priv(dev);
 	struct napi_struct *napi = &priv->napi;
 
-	if (netif_rx_schedule_prep(napi)) {
-		__netif_rx_schedule(napi);
+	if (napi_schedule_prep(napi)) {
+		__napi_schedule(napi);
 	}
 	return IRQ_HANDLED;
 }
