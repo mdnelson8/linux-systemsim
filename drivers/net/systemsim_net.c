@@ -145,7 +145,7 @@ static int systemsim_net_recv(int devno, void *buf, ulong size)
 
 static int systemsim_net_start_xmit(struct sk_buff *skb, struct net_device *dev)
 {
-	struct netdev_private *priv = (struct netdev_private *)dev->priv;
+	struct netdev_private *priv = netdev_priv(dev);
 	int devno = priv->devno;
 
 	skb->dev = dev;
@@ -213,7 +213,7 @@ static int systemsim_net_poll(struct napi_struct *napi, int budget)
 	budget -= frames;
 
 	if ((!ret) && (dev->irq))
-		netif_rx_complete(dev, napi);
+		netif_rx_complete(napi);
 
 	return ret;
 }
@@ -234,7 +234,7 @@ static void systemsim_net_timer(struct work_struct *ptp)
 
 static struct net_device_stats *get_stats(struct net_device *dev)
 {
-	struct netdev_private *priv = (struct netdev_private *)dev->priv;
+	struct netdev_private *priv = netdev_priv(dev);
 	return (struct net_device_stats *)&(priv->stats);
 }
 
@@ -245,18 +245,16 @@ systemsim_net_intr(int irq, void *dev_instance)
 	struct netdev_private *priv = netdev_priv(dev);
 	struct napi_struct *napi = &priv->napi;
 
-	if (netif_rx_schedule_prep(dev, napi)) {
-		__netif_rx_schedule(dev, napi);
+	if (netif_rx_schedule_prep(napi)) {
+		__netif_rx_schedule(napi);
 	}
 	return IRQ_HANDLED;
 }
 
 static int systemsim_net_open(struct net_device *dev)
 {
-	struct netdev_private *priv;
+	struct netdev_private *priv = netdev_priv(dev);
 	int ret = 0;
-
-	priv = dev->priv;
 
 	/*
 	 * we can't start polling in systemsim_net_init, because I don't think
@@ -293,7 +291,6 @@ static int systemsim_net_close(struct net_device *dev)
 	if (dev->irq)
 		free_irq(dev->irq, dev);
 
-	priv = dev->priv;
 	priv->closing = 1;
 	if (dev->irq == 0) {
 		cancel_delayed_work(&priv->poll_task);
@@ -349,12 +346,7 @@ int __init do_systemsim_net_probe(struct net_device *dev)
 	dev->set_mac_address = systemsim_net_set_mac_address;
 	dev->do_ioctl = systemsim_net_ioctl;
 
-	dev->priv = kmalloc(sizeof(struct netdev_private), GFP_KERNEL);
-	if (dev->priv == NULL)
-		return -ENOMEM;
-	memset(dev->priv, 0, sizeof(struct netdev_private));
-
-	priv = dev->priv;
+	priv = netdev_priv(dev);
 	priv->devno = devno;
 	priv->closing = 0;
 	dev->get_stats = get_stats;
@@ -372,7 +364,7 @@ int __init do_systemsim_net_probe(struct net_device *dev)
 
 struct net_device *__init systemsim_net_probe(int unit)
 {
-	struct net_device *dev = alloc_etherdev(0);
+	struct net_device *dev = alloc_etherdev(sizeof(struct netdev_private));
 	int err;
 
 	if (!dev)
