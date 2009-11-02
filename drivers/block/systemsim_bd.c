@@ -87,7 +87,7 @@ static struct systemsim_bd_device systemsim_bd_dev[MAX_SYSTEMSIM_BD];
 static inline int
 systemsim_disk_read(int devno, void *buf, ulong sect, ulong nrsect)
 {
-	memset(buf, 0, nrsect*BD_SECT_SZ);
+	memset(buf, 0, nrsect * BD_SECT_SZ);
 	return callthru3(BOGUS_DISK_READ, (unsigned long)buf,
 			 (unsigned long)sect,
 			 (unsigned long)((nrsect << 16) | devno));
@@ -135,8 +135,10 @@ static void do_systemsim_bd_request(struct request_queue *q)
 	int result = 0;
 	struct request *req;
 
-	while ((req = elv_next_request(q)) != NULL) {
+	while ((req = blk_fetch_request(q)) != NULL) {
 		int minor = req->rq_disk->first_minor;
+		struct req_iterator iter;
+		struct bio_vec *bvec;
 
 		if (!systemsim_bd_dev[minor].initialized) {
 			systemsim_bd_init_disk(minor);
@@ -144,20 +146,40 @@ static void do_systemsim_bd_request(struct request_queue *q)
 
 		switch (rq_data_dir(req)) {
 		case READ:
-			result = systemsim_disk_read(minor,
-						     req->buffer, req->sector,
-						     req->current_nr_sectors);
+			rq_for_each_segment(bvec, req, iter) {
+
+				result = systemsim_disk_read(minor,
+							     req->buffer,
+							     blk_rq_pos(req),
+							     blk_rq_cur_sectors
+							     (req));
+				if (result != 0) {
+					printk(KERN_ERR
+					       "bogus_disk: Error on disk read\n");
+					break;
+				}
+			}
 			break;
+
 		case WRITE:
-			result = systemsim_disk_write(minor,
-						      req->buffer, req->sector,
-						      req->current_nr_sectors);
-		};
+			rq_for_each_segment(bvec, req, iter) {
+				result = systemsim_disk_write(minor,
+							      req->buffer,
+							      blk_rq_pos(req),
+							      blk_rq_cur_sectors
+							      (req));
+				if (result != 0) {
+					printk(KERN_ERR
+					       "bogus_disk: Error on disk write\n");
+					break;
+				}
+			}
+		}
 
 		if (result)
-			end_request(req, 0);	/* failure */
+			__blk_end_request_all(req, -EIO);	/* failure */
 		else
-			end_request(req, 1);	/* success */
+			__blk_end_request_all(req, 0);		/* success */
 	}
 }
 
@@ -171,8 +193,8 @@ static int systemsim_bd_revalidate(struct gendisk *disk)
 }
 
 static struct block_device_operations systemsim_bd_fops = {
-	.owner =		THIS_MODULE,
-	.revalidate_disk =	systemsim_bd_revalidate,
+	.owner = THIS_MODULE,
+	.revalidate_disk = systemsim_bd_revalidate,
 };
 
 static spinlock_t systemsim_bd_lock = SPIN_LOCK_UNLOCKED;
@@ -214,20 +236,20 @@ static int __init systemsim_bd_init(void)
 			goto out;
 		}
 	}
-	
-	
+
 	err = register_blkdev(MAJOR_NR, "systemsim_bd");
-	if(err < 0) {
-		printk(KERN_INFO 
-			"systemsim bogus disk: failed to reg %d\n",err);
+	if (err < 0) {
+		printk(KERN_INFO
+		       "systemsim bogus disk: failed to reg %d\n", err);
 		goto out;
 	}
 #ifdef MODULE
 	printk(KERN_INFO "systemsim bogus disk: device at major %d\n",
 	       MAJOR_NR);
 #else
-	printk(KERN_INFO "systemsim bogus disk: registered at major %d(%d)\n",
-			err, MAJOR_NR);
+	printk(KERN_INFO
+	       "systemsim bogus disk: registered at major %d(%d)\n",
+	       err, MAJOR_NR);
 #endif
 
 	/*
