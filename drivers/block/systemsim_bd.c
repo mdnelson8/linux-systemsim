@@ -138,6 +138,10 @@ static void do_systemsim_bd_request(struct request_queue *q)
 	while ((req = elv_next_request(q)) != NULL) {
 		int minor = req->rq_disk->first_minor;
 
+		if (!systemsim_bd_dev[minor].initialized) {
+			systemsim_bd_init_disk(minor);
+		}
+
 		switch (rq_data_dir(req)) {
 		case READ:
 			result = systemsim_disk_read(minor,
@@ -243,7 +247,7 @@ static int __init systemsim_bd_init(void)
 		disk->fops = &systemsim_bd_fops;
 		disk->private_data = &systemsim_bd_dev[i];
 		sprintf(disk->disk_name, "mambobd%d", i);
-		set_capacity(disk, 0x7ffffc00ULL << 1);	/* 2 TB */
+		set_capacity(disk, 0);	/* Init to zero until we know better */
 		add_disk(disk);
 	}
 
