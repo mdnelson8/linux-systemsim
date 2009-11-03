@@ -138,21 +138,31 @@ static void do_systemsim_bd_request(struct request_queue *q)
 	while ((req = blk_fetch_request(q)) != NULL) {
 		int minor = req->rq_disk->first_minor;
 		struct req_iterator iter;
+
+		//int tmptest, tmptest2;
 		struct bio_vec *bvec;
 
 		if (!systemsim_bd_dev[minor].initialized) {
 			systemsim_bd_init_disk(minor);
 		}
 
+		if (!blk_fs_request(req)) {
+			printk(KERN_ERR "bogus disk: unsuppoerted command\n");
+			__blk_end_request_all(req, 0);		/* success */
+			continue;
+		}
+
+		//tmptest = blk_rq_pos(req);
+		//tmptest2 = blk_rq_cur_sectors(req);
+		//printk(KERN_ERR "bogus disk: %d %d\n", tmptest, tmptest2);
+
 		switch (rq_data_dir(req)) {
 		case READ:
 			rq_for_each_segment(bvec, req, iter) {
-
 				result = systemsim_disk_read(minor,
-							     req->buffer,
-							     blk_rq_pos(req),
-							     blk_rq_cur_sectors
-							     (req));
+					req->buffer,
+					blk_rq_pos(req),
+					blk_rq_cur_sectors(req));
 				if (result != 0) {
 					printk(KERN_ERR
 					       "bogus_disk: Error on disk read\n");
@@ -263,12 +273,19 @@ static int __init systemsim_bd_init(void)
 		systemsim_bd_dev[i].initialized = 0;
 		systemsim_bd_dev[i].refcnt = 0;
 		systemsim_bd_dev[i].flags = 0;
+		/* tell block layer we aren't a rotational deivce */
 		disk->major = MAJOR_NR;
 		disk->minors = 1;
 		disk->first_minor = i;
 		disk->fops = &systemsim_bd_fops;
 		disk->private_data = &systemsim_bd_dev[i];
 		sprintf(disk->disk_name, "mambobd%d", i);
+		queue_flag_set_unlocked(QUEUE_FLAG_NONROT, disk->queue);
+		blk_queue_max_phys_segments(disk->queue, 1);
+        	blk_queue_max_hw_segments(disk->queue, 1);
+   		blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_ANY);
+		blk_queue_max_segment_size(disk->queue, 1024);
+		blk_queue_logical_block_size(disk->queue, 1024);
 		set_capacity(disk, 0);	/* Init to zero until we know better */
 		add_disk(disk);
 	}
