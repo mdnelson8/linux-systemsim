@@ -232,7 +232,7 @@ static void systemsim_net_timer(struct work_struct *ptp)
 	}
 }
 
-static struct net_device_stats *get_stats(struct net_device *dev)
+static struct net_device_stats *systemsim_net_get_stats(struct net_device *dev)
 {
 	struct netdev_private *priv = netdev_priv(dev);
 	return (struct net_device_stats *)&(priv->stats);
@@ -300,13 +300,6 @@ static int systemsim_net_close(struct net_device *dev)
 	return 0;
 }
 
-static struct net_device_stats systemsim_net_stats;
-
-static struct net_device_stats *systemsim_net_get_stats(struct net_device *dev)
-{
-	return &systemsim_net_stats;
-}
-
 static int systemsim_net_set_mac_address(struct net_device *dev, void *p)
 {
 	return -EOPNOTSUPP;
@@ -317,6 +310,15 @@ static int systemsim_net_ioctl(struct net_device *dev, struct ifreq *ifr,
 	return -EOPNOTSUPP;
 }
 
+static const struct net_device_ops systemsim_netdev_ops = {
+        .ndo_open               = systemsim_net_open,
+        .ndo_stop               = systemsim_net_close,
+        .ndo_start_xmit         = systemsim_net_start_xmit,
+        .ndo_get_stats          = systemsim_net_get_stats,
+        .ndo_set_mac_address    = systemsim_net_set_mac_address,
+        .ndo_do_ioctl           = systemsim_net_ioctl
+};
+ 
 /* Initialize the rest of the device. */
 int __init do_systemsim_net_probe(struct net_device *dev)
 {
@@ -339,17 +341,11 @@ int __init do_systemsim_net_probe(struct net_device *dev)
 
 	dev->irq = irq;
 	dev->mtu = SYSTEMSIM_MTU;
-	dev->open = systemsim_net_open;
-	dev->stop = systemsim_net_close;
-	dev->hard_start_xmit = systemsim_net_start_xmit;
-	dev->get_stats = systemsim_net_get_stats;
-	dev->set_mac_address = systemsim_net_set_mac_address;
-	dev->do_ioctl = systemsim_net_ioctl;
+	dev->netdev_ops = &systemsim_netdev_ops;
 
 	priv = netdev_priv(dev);
 	priv->devno = devno;
 	priv->closing = 0;
-	dev->get_stats = get_stats;
 
 	if (dev->irq == 0) {
 		priv->data = (void *)dev;
