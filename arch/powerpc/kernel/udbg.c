@@ -44,7 +44,7 @@ void __init udbg_early_init(void)
 	/* Maple real mode debug */
 	udbg_init_maple_realmode();
 #elif defined(CONFIG_PPC_EARLY_DEBUG_FSS)
-	/* Maple real mode debug */
+	/* IBM Full System Simulator (systemsim) real mode debug */
 	udbg_init_fss();
 #elif defined(CONFIG_PPC_EARLY_DEBUG_ISERIES)
 	/* For iSeries - hit Ctrl-x Ctrl-x to see the output */
