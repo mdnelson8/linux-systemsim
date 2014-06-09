@@ -172,6 +172,21 @@ config PPDEV
 
 source "drivers/tty/hvc/Kconfig"
 
+config HVC_FSS
+        bool "IBM Full System Simulator Console support"
+        depends on PPC_SYSTEMSIM
+        select HVC_DRIVER
+        help
+          IBM Full System Simulator Console device driver which makes use of
+          the HVC_DRIVER front end.
+
+config PPC_EARLY_DEBUG_FSS
+        bool "IBM Full System Simulator Console early debug support"
+        depends on PPC_SYSTEMSIM
+        select HVC_FSS
+        help
+          Display early debug info over the Full System simulator console
+
 config VIRTIO_CONSOLE
 	tristate "Virtio console"
 	depends on VIRTIO
