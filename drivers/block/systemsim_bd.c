@@ -281,8 +281,7 @@ static int __init systemsim_bd_init(void)
 		disk->private_data = &systemsim_bd_dev[i];
 		sprintf(disk->disk_name, "mambobd%d", i);
 		queue_flag_set_unlocked(QUEUE_FLAG_NONROT, disk->queue);
-		blk_queue_max_phys_segments(disk->queue, 1);
-        	blk_queue_max_hw_segments(disk->queue, 1);
+        	blk_queue_max_segments(disk->queue, 1);
    		blk_queue_bounce_limit(disk->queue, BLK_BOUNCE_ANY);
 		blk_queue_max_segment_size(disk->queue, 1024);
 		blk_queue_logical_block_size(disk->queue, 1024);
