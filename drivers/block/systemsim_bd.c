@@ -146,7 +146,7 @@ static void do_systemsim_bd_request(struct request_queue *q)
 			systemsim_bd_init_disk(minor);
 		}
 
-		if (!blk_fs_request(req)) {
+		if (!(req->cmd_type == REQ_TYPE_FS)) {
 			printk(KERN_ERR "bogus disk: unsuppoerted command\n");
 			__blk_end_request_all(req, 0);		/* success */
 			continue;
