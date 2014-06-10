@@ -140,7 +140,7 @@ static void do_systemsim_bd_request(struct request_queue *q)
 		struct req_iterator iter;
 
 		//int tmptest, tmptest2;
-		struct bio_vec *bvec;
+		struct bio_vec bvec;
 
 		if (!systemsim_bd_dev[minor].initialized) {
 			systemsim_bd_init_disk(minor);
