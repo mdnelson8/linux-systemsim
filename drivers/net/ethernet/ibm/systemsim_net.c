@@ -50,6 +50,7 @@
 #include <linux/fcntl.h>
 #include <linux/in.h>
 #include <linux/init.h>
+#include <linux/module.h>
 
 #include <asm/system.h>
 #include <linux/uaccess.h>
