@@ -207,7 +207,7 @@ static struct block_device_operations systemsim_bd_fops = {
 	.revalidate_disk = systemsim_bd_revalidate,
 };
 
-static spinlock_t systemsim_bd_lock = SPIN_LOCK_UNLOCKED;
+static DEFINE_SPINLOCK(systemsim_bd_lock);
 
 static int __init systemsim_bd_init(void)
 {
