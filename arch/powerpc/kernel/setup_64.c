@@ -560,7 +560,7 @@ static void __init setup_systemsim_idle(void)
 	if (systemsim_node) {
 		printk(KERN_INFO
 		 "Systemsim detected: Using optomized idle loop\n");
-		ppc_md.idle_loop = systemsim_idle;
+		ppc_md.power_save = systemsim_idle;
 		of_node_put(systemsim_node);
 	}
 #endif

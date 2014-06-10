@@ -2,7 +2,8 @@
  * Idle daemon for the IBM Full System Simulator.
  *
  * Originally Written by Cort Dougan (cort@cs.nmt.edu)
- *    Copyright (c) 2003-2006 IBM Corporation
+ * Updated for use with ppc_md.power_save by Mark nelson (nelsondm@us.ibm.com)
+ *    Copyright (c) 2003-2014 IBM Corporation
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,12 +25,5 @@ static inline void systemsim_halt(void)
 
 void systemsim_idle(void)
 {
-	while (1) {
-		while (!need_resched())
-			systemsim_halt();
-
-		preempt_enable_no_resched();
-		schedule();
-		preempt_disable();
-	}
+	systemsim_halt();
 }
